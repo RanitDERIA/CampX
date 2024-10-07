@@ -9,6 +9,7 @@ on:
 jobs:
   labeler:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -43,11 +44,16 @@ jobs:
               }
             }
 
+            // Only add labels if there are any to add
             if (labels.length > 0) {
-              github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                labels: labels
-              });
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  labels: labels
+                });
+              } catch (error) {
+                console.error(`Failed to add labels: ${error.message}`);
+              }
             }
